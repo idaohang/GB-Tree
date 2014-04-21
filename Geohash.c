@@ -284,10 +284,7 @@ static int uint8s_plus_minus(uint8_t *src, uint8_t *dst, size_t length, int plus
 }
 
 static int neighbors(uint16_t *interleaved, size_t bitlength, uint16_t* dst, size_t dst_length, size_t *dst_count){
-	size_t interleaved_length = 0;
-	while(interleaved_length*16 < bitlength){
-		interleaved_length++;
-	}
+	size_t interleaved_length = 4;
 	if(dst_length<interleaved_length*8){
 		return GEOHASH_INTERNALERROR;
 	}
@@ -355,6 +352,7 @@ static int neighbors(uint16_t *interleaved, size_t bitlength, uint16_t* dst, siz
 
 static int geo_neighbors_64_impl(uint64_t code, size_t precision, uint64_t *dst, int *count)
 {
+	uint64_t holder = 0xffffffffffffffff << (DATA_BIT_PRECISION - precision);
 	int ret = GEOHASH_OK;
 	size_t interleaved_length = 4;
 	
@@ -377,6 +375,8 @@ static int geo_neighbors_64_impl(uint64_t code, size_t precision, uint64_t *dst,
 	if(count){
 		*count = dst_count;
 	}
+	for(i = 0; i < (int)dst_count; ++i)
+		dst[i] = dst[i] & holder; 
 	if(dst_count == 8){
 		dst[3] ^= dst[5];
 		dst[5] ^= dst[3];

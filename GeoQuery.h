@@ -15,6 +15,7 @@
 #include "GBTTable.h"
 #include "GBTreeBase.h"
 #include "GBTreeNode.h"
+#include "GBTreeIndex.h"
 
 enum{
 	GEOQUERY_OK,
@@ -25,6 +26,7 @@ typedef struct _NearestResult{
 	RecordId rid;
 	double distance;
 }NearestResult;
+//compare function used for set
 typedef struct _NearestResultCmp{
 	bool operator()(const NearestResult& n1, const NearestResult& n2) const
 	{
@@ -59,7 +61,7 @@ class GeoQuery
 		 * @param count[IN] the number of the answer
 		 * @param min_distance[IN] minimal distance between the address and answer
 		 * */
-		static RT Nearest(const char *table, uint64_t address, std::vector<NearestResult>& outputs, size_t count=50, double min_distance=default_precision, double max_distance=0.0);
+		static RT Nearest(const char *table, uint64_t address, std::vector<NearestResult>& outputs, size_t count=50, double min_distance=default_precision, double max_distance=default_max_distance);
 
 	private:
 
@@ -104,5 +106,7 @@ class GeoQuery
 		static uint32_t ExtractLatLng(uint64_t address, int type);
 	private:
 		static double default_precision;
+		static double default_max_distance;
+		static RT FindPointImpl(GBTreeIndex& gbt_index, uint64_t address, RecordId& outputs); 
 };
 #endif

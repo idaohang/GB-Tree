@@ -17,6 +17,10 @@ int TestPointSelect();
  * Test the range query
  * */
 int TestRangeQuery();
+/* *
+ * Test the Nearest query
+ * */
+int TestNearestQuery();
 
 #endif
 

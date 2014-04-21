@@ -25,6 +25,7 @@
 #include "GBTTable.h"
 #include "GBTreeIndex.h"
 #include "Geohash.h"
+#include "PathManager.h"
 #include "GeoQuery.h"
 RT GBTEngine::load(const std::string& table, const std::string& loadfile, bool index)
 {
@@ -99,6 +100,7 @@ RT GBTEngine::load(const std::string& table, const std::string& loadfile, bool i
 
 	RecordId rid;
 	int total = 0;
+	key = 0;
 	while (dbt.readForward(cursor, key, rid) == 0){
 		printf("%d\n", cursor.pid);
 		printf("{ key: %" PRIx64 "", key);
@@ -172,8 +174,8 @@ RT GBTEngine::RangeSelectImpl(const std::string table, double* lnglat, std::vect
 {
 	RT rt;
 	std::vector<RecordId> outputs;
-	uint64_t starter, end;
-	uint64_t key;
+	uint64_t starter = 0, end = 0;
+	uint64_t key = 0;
 	std::string value;
 	GBTTable table_file;
 	if(geohash_encode_64(lnglat[1], lnglat[0], &starter) != GEOHASH_OK)
@@ -186,7 +188,7 @@ RT GBTEngine::RangeSelectImpl(const std::string table, double* lnglat, std::vect
 		if(outputs.size() == 0)
 			return 0;
 
-		if((rt = table_file.open("data/"+table+".tbl", 'r')) < 0)
+		if((rt = table_file.open(PathManager::GetTablePath(table), 'r')) < 0)
 			return rt;
 		std::vector<RecordId>::iterator it;
 		for(it = outputs.begin(); it != outputs.end(); ++it)
@@ -217,4 +219,61 @@ RT GBTEngine::RangeSelect(const std::string table, double* lnglat, std::vector<s
 	epagecnt = GBTFile::getPageReadCount();
 	fprintf(stderr, "  -- %.5f seconds to run the select command. Read %d pages\n", ((float)(etime - btime))/sysconf(_SC_CLK_TCK), epagecnt - bpagecnt);
 	return rt;
+}
+RT GBTEngine::NearestSelectImpl(const std::string table, double* lnglat, std::vector<NearResult_t>& outputs, size_t count, double min_distance, double max_distance )
+{
+	RT rt;
+	std::vector<NearestResult> nearests;
+	uint64_t key = 0;
+	double longitude, latitude;
+	std::string value;
+	GBTTable table_file;
+	NearResult_t result;
+	if(geohash_encode_64(lnglat[1], lnglat[0], &key) != GEOHASH_OK)
+		return RT_GEOHASH_ERROR;
+
+	if(GeoQuery::Nearest(table.c_str(), key, nearests, count, min_distance, max_distance) == GEOQUERY_OK)
+	{
+		if(nearests.size() == 0)
+			return 0;
+
+		if((rt = table_file.open(PathManager::GetTablePath(table), 'r')) < 0)
+			return rt;
+		std::vector<NearestResult>::iterator it;
+		for(it = nearests.begin(); it != nearests.end(); ++it)
+		{
+			if((rt = table_file.read(it->rid, key, value)) != 0)
+			{
+				table_file.close();
+				return rt;
+			}
+			if(geohash_decode_64(key, &latitude, &longitude) == GEOHASH_OK)
+			{
+				result.longitude = longitude;
+				result.latitude = latitude;
+				result.value = value;
+				result.distance = it->distance;
+			}
+			outputs.push_back(result);
+			fprintf(stdout, "%s, dis: %.5f\n", value.c_str(), it->distance);
+		}
+	}
+	table_file.close();
+	return 0;
+
+}
+RT GBTEngine::NearestSelect(const std::string table, double* lnglat, std::vector<NearResult_t>& outputs, size_t count, double min_distance, double max_distance )
+{
+	RT rt;
+	struct tms tmsbuf;
+	clock_t btime, etime;
+	int     bpagecnt, epagecnt;
+	btime = times(&tmsbuf); 
+	bpagecnt = GBTFile::getPageReadCount();
+	rt = NearestSelectImpl(table, lnglat, outputs, count, min_distance, max_distance);
+	etime = times(&tmsbuf);
+	epagecnt = GBTFile::getPageReadCount();
+	fprintf(stderr, "  -- %.5f seconds to run the select command. Read %d pages\n", ((float)(etime - btime))/sysconf(_SC_CLK_TCK), epagecnt - bpagecnt);
+	return rt;
+
 }

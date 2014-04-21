@@ -19,7 +19,6 @@
 #include <set>
 #include <stack>
 #include "GeoQuery.h"
-#include "GBTreeIndex.h"
 #include "GBTFile.h"
 #include "Geohash.h"
 #include "GBTreeNode.h"
@@ -57,6 +56,7 @@ static double LatLon2Dist(double lat1, double lng1, double lat2, double lng2)
 
 uint32_t GeoQuery::range_precision = 3;
 double GeoQuery::default_precision = 0.00521025;
+double GeoQuery::default_max_distance = 6371004000.0;
 
 RT GeoQuery::RangeQuery(const char* table, uint64_t left_down, uint64_t right_up, std::vector<RecordId>& outputs)
 {
@@ -291,29 +291,36 @@ int GeoQuery::GeoHashCmp(uint64_t first, uint64_t second)
 	}
 }
 
-RT GeoQuery::FindPoint(const char *table, uint64_t address, RecordId& outputs)
+RT GeoQuery::FindPointImpl(GBTreeIndex& gbt_index, uint64_t address, RecordId& outputs)
 {
 	RT rt;
+	IndexCursor cursor;
 	uint64_t key;
 	RecordId rid;
-	IndexCursor cursor;
-	GBTreeIndex gbt_index;
-	if((rt = gbt_index.open(PathManager::GetIndexPath(std::string(table)), 'r')) != 0) return rt;
-
+	uint64_t prec = 1 << range_precision;
 	if((rt = gbt_index.locate(address, cursor)) != 0){
 		gbt_index.close();
 		return rt;
 	}	
 	if ((rt = gbt_index.readForward(cursor, key, rid)) == 0) {
-		if((key - address) < default_precision)
+		if((key - address) < prec)
 			outputs = rid;
 		else{
-			gbt_index.close();
 			return GEOQUERY_NOT_FOUND;
 		}
 	}
-	gbt_index.close();
 	return GEOQUERY_OK;
+
+}
+RT GeoQuery::FindPoint(const char *table, uint64_t address, RecordId& outputs)
+{
+	RT rt;
+	GBTreeIndex gbt_index;
+	if((rt = gbt_index.open(PathManager::GetIndexPath(std::string(table)), 'r')) != 0) return rt;
+	rt = FindPointImpl(gbt_index, address, outputs);
+
+	gbt_index.close();
+	return rt;
 }
 RT GeoQuery::Nearest(const char *table, uint64_t address, std::vector<NearestResult>& outputs, size_t count, double min_distance, double max_distance)
 {
@@ -321,13 +328,14 @@ RT GeoQuery::Nearest(const char *table, uint64_t address, std::vector<NearestRes
 	
 	int i;
 	int bit_start = 0;
-	int bit_end = -2;
-	int start_precision = default_precision; 
+	int bit_end = 0;
+	double start_precision = default_precision; 
 	int count_neighbors = 0;
 	int bit_length;
 	uint64_t neighbors[8];
 	uint64_t key;
-	double lnglat[4];
+	uint64_t holder = 1;
+	double lnglat[4] ;
 	RecordId rid;
 	IndexCursor cursor;
 	NearestResult n_result;
@@ -337,6 +345,8 @@ RT GeoQuery::Nearest(const char *table, uint64_t address, std::vector<NearestRes
 
 	if(min_distance < default_precision)
 		min_distance = default_precision;
+	if((max_distance - 0.0) < DOUBLE_EPSILON)
+		max_distance = default_max_distance; 
 	if((max_distance - min_distance) < DOUBLE_EPSILON)
 		return GEOQUERY_INTERNAL_ERROR;
 
@@ -348,7 +358,7 @@ RT GeoQuery::Nearest(const char *table, uint64_t address, std::vector<NearestRes
 		bit_end += 2;
 	}
 	//get max bit length base on the max_distance.
-	if(max_distance <= default_precision)
+	if((max_distance - default_max_distance) < DOUBLE_EPSILON)
 		bit_end = DATA_BIT_PRECISION;
 	else{
 		while(((size_t)bit_end < DATA_BIT_PRECISION) && (max_distance - start_precision) > DOUBLE_EPSILON)
@@ -376,7 +386,7 @@ RT GeoQuery::Nearest(const char *table, uint64_t address, std::vector<NearestRes
 		if((size_t)bit_length == DATA_BIT_PRECISION)
 		{
 			for(i = 0; i < count_neighbors; i++){
-				if(FindPoint(table, neighbors[i], rid) == GEOQUERY_OK){
+				if(FindPointImpl(gbt_index, neighbors[i], rid) == GEOQUERY_OK){
 					if((rt = geohash_decode_64(neighbors[i], lnglat+2, lnglat+3)) != GEOHASH_OK){
 						gbt_index.close();
 						return rt;
@@ -391,13 +401,11 @@ RT GeoQuery::Nearest(const char *table, uint64_t address, std::vector<NearestRes
 		{
 			for(i = 0; i < count_neighbors; i++)
 			{
-				if(i == 4 && (answers.size() >= count))
-						break;
 				if((rt = gbt_index.locate(neighbors[i], cursor)) != 0){
 					gbt_index.close();
 					return rt;
 				}
-				neighbors[i] += (1<<bit_start);
+				neighbors[i] += (holder<<bit_start);
 				if((rt = gbt_index.readForward(cursor, key, rid)) != 0){
 					gbt_index.close();
 					return rt;
@@ -418,6 +426,7 @@ RT GeoQuery::Nearest(const char *table, uint64_t address, std::vector<NearestRes
 			}
 			
 		}
+		bit_start += 2;
 	}
 	gbt_index.close();
 

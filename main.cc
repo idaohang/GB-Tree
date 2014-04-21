@@ -11,6 +11,8 @@ int main(int args, char *argv[])
 		  TestPointSelect();
 	  else if(strcmp(argv[1], "2") == 0)
 		  TestRangeQuery();
+	  else if(strcmp(argv[1], "3") == 0)
+		  TestNearestQuery();
   }
   return 0;
 }

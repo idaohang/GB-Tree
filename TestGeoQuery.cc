@@ -22,6 +22,7 @@
 #include <string>
 #include "TestGeoQuery.h"
 #include "GBTEngine.h"
+#include "PathManager.h"
 
 
 int TestPointSelect()
@@ -57,5 +58,24 @@ int TestRangeQuery()
 	rt = GBTEngine::RangeSelect(table, lnglat, outputs);
 	assert(rt == 0);
 	return rt;
+}
+int TestNearestQuery()
+{
+	int rt;
+	size_t count;
+	std::string value;
+	std::string table("zj");
+	std::string loadfile("data/zj.txt");
+	std::vector<NearResult_t> outputs;
+	rt = GBTEngine::load(table, loadfile, false);
+	assert(rt == 0);
 
+	double lnglat[2];
+	lnglat[0] = 120.158329;
+	lnglat[1] = 30.2786929;
+	count = 50;
+	rt = GBTEngine::NearestSelect(table, lnglat, outputs, count);
+	assert(outputs.size() == count);
+
+	return rt;
 }

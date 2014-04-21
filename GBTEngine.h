@@ -13,6 +13,12 @@
 #include <stdio.h>
 #include <string>
 #include "GBTreeBase.h"
+typedef struct _NearResult{
+	uint64_t longitude;
+	uint64_t latitude;
+	std::string value;
+	double distance;
+}NearResult_t;
 /**
  * the class that takes, parses, and executes the user commands.
  */
@@ -31,7 +37,15 @@ class GBTEngine {
    */
   static RT EqualSelect(const std::string& table, double longitude, double latitude, std::string& value);
 
+  /* *
+   * Do Range Query and print it
+   * @param table[IN] table name
+   * @param lnglat[IN] the longitude and latitude of the range.
+   * @param values[OUT] outputs of Query.
+   * */
   static RT RangeSelect(const std::string table, double* lnglat, std::vector<std::string>& values);
+
+  static RT NearestSelect(const std::string table, double* lnglat, std::vector<NearResult_t>& outputs, size_t count=50, double min_distance=0.0, double max_distance=0.0 );
 
   /**
    * load a table from a load file.
@@ -53,6 +67,7 @@ class GBTEngine {
  private:
   static RT EqualSelectImpl(const std::string table, double longitude, double latitude, std::string& value);
   static RT RangeSelectImpl(const std::string table, double* lnglat, std::vector<std::string>& values);
+  static RT NearestSelectImpl(const std::string table, double* lnglat, std::vector<NearResult_t>& outputs, size_t count=50, double min_distance=0.0, double max_distance=0.0 );
 };
 
 
