@@ -1,0 +1,4 @@
+114.3563998,30.5273152,international school of software
+114.3551552,30.5270888,dormitory of iss
+114.3579769,30.5331558,wuhan university
+114.3611312,30.5251711,frendship square
