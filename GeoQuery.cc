@@ -28,7 +28,7 @@ static const uint64_t LATITUDE_HOLDER = UINT64_C(0x5555555555555555);
 static const uint64_t LONGITUDE_HOLDER = UINT64_C(0xaaaaaaaaaaaaaaaa);
 
 static const double PI = 3.1415926;
-static const double EARTH_RADIUS = 6371.004;
+static const double EARTH_RADIUS = 6378.137;
 /* *
  * convert the latitude and longitude to radian.
  *
