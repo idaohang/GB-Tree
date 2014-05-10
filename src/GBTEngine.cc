@@ -147,7 +147,9 @@ RT GBTEngine::EqualSelectImpl(const std::string table, double longitude, double 
 			return rt;
 		}
 		
+#ifdef DEBUG
 		fprintf(stdout, "%f, %f, %s\n", longitude, latitude, value.c_str()); 
+#endif
 	}
 	table_file.close();
 	return 0;
@@ -156,18 +158,8 @@ RT GBTEngine::EqualSelectImpl(const std::string table, double longitude, double 
 RT GBTEngine::EqualSelect(const std::string& table, double longitude, double latitude, std::string& value)
 {
 	RT rt;
-	struct tms tmsbuf;
-	clock_t btime, etime;
-	int     bpagecnt, epagecnt;
-	
-	btime = times(&tmsbuf); 
-	bpagecnt = GBTFile::getPageReadCount();
 	rt = EqualSelectImpl(table, longitude, latitude, value);
-	etime = times(&tmsbuf);
-	epagecnt = GBTFile::getPageReadCount();
-	fprintf(stderr, "  -- %.5f seconds to run the select command. Read %d pages\n", ((float)(etime - btime))/sysconf(_SC_CLK_TCK), epagecnt - bpagecnt);
 	return rt;
-
 }
 
 RT GBTEngine::RangeSelectImpl(const std::string table, double* lnglat, std::vector<std::string>& values)
@@ -265,15 +257,7 @@ RT GBTEngine::NearestSelectImpl(const std::string table, double* lnglat, std::ve
 RT GBTEngine::NearestSelect(const std::string table, double* lnglat, std::vector<NearResult_t>& outputs, size_t count, double min_distance, double max_distance )
 {
 	RT rt;
-	struct tms tmsbuf;
-	clock_t btime, etime;
-	int     bpagecnt, epagecnt;
-	btime = times(&tmsbuf); 
-	bpagecnt = GBTFile::getPageReadCount();
 	rt = NearestSelectImpl(table, lnglat, outputs, count, min_distance, max_distance);
-	etime = times(&tmsbuf);
-	epagecnt = GBTFile::getPageReadCount();
-	fprintf(stderr, "  -- %.5f seconds to run the select command. Read %d pages\n", ((float)(etime - btime))/sysconf(_SC_CLK_TCK), epagecnt - bpagecnt);
 	return rt;
 
 }

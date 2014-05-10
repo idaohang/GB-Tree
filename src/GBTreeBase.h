@@ -8,7 +8,7 @@
  */
 #ifndef GBTREEBASE_H_
 #define GBTREEBASE_H_
-#define DEBUG
+//#define DEBUG
 #include <string.h>
 
 #if defined(_MSC_VER) && (_MSC_VER <= 1500)

@@ -12,15 +12,15 @@
 /* *
  * Test the point select.
  * */
-int TestPointSelect();
+int TestPointSelect(const char* table_name, const char*data_file);
 /* *
  * Test the range query
  * */
-int TestRangeQuery();
+int TestRangeQuery(const char* table_name, const char*data_file);
 /* *
  * Test the Nearest query
  * */
-int TestNearestQuery();
+int TestNearestQuery(const char* table_name, const char*data_file);
 
 #endif
 

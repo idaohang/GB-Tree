@@ -15,7 +15,7 @@
  *
  * =====================================================================================
  */
-
+#include <sys/times.h>
 #include <assert.h>
 #include <stdio.h>
 #include <vector>
@@ -23,28 +23,95 @@
 #include "TestGeoQuery.h"
 #include "GBTEngine.h"
 #include "PathManager.h"
+#include "GBTFile.h"
 
 
-int TestPointSelect()
+static void GetData(std::string table, double *coordinates)
+{
+
+	if(table.compare("small") == 0){
+		coordinates[0] = 120.9333383;
+		coordinates[1] = 30.827487;
+		coordinates[2] = 120.6656566;
+		coordinates[3] = 30.9074838;
+		coordinates[4] = 120.9515271;
+		coordinates[5] = 30.84805509; 
+	}
+	else if(table.compare("middle") == 0){
+		coordinates[0] = 120.9333383;
+		coordinates[1] = 30.827487;
+		coordinates[2] = 120.2657404;
+		coordinates[3] = 30.30048649;
+		coordinates[4] = 120.456645;
+		coordinates[5] = 30.91548937; 
+	}
+	else if(table.compare("large") == 0){
+		coordinates[0] = 120.7402979;
+		coordinates[1] = 36.9743701;
+		coordinates[2] = 120.3607551;
+		coordinates[3] = 36.1212045;
+		coordinates[4] = 120.4015953;
+		coordinates[5] = 36.20051595; 
+	}
+	else if(table.compare("xlarge") == 0){
+		coordinates[0] = 116.2369216;
+		coordinates[1] = 39.99827827;
+		coordinates[2] = 116.6549728;
+		coordinates[3] = 39.88331447;
+		coordinates[4] = 116.3136523;
+		coordinates[5] = 39.97118243; 
+	}
+	else if(table.compare("xxlarge") == 0){
+		coordinates[0] = 113.2778673;
+		coordinates[1] = 23.8197065;
+		coordinates[2] = 113.4583184;
+		coordinates[3] = 23.88698923;
+		coordinates[4] = 116.3136523;
+		coordinates[5] = 39.97118243; 
+	}else{
+		coordinates[0] = 113.2778673;
+		coordinates[1] = 23.8197065;
+		coordinates[2] = 120.2892393;
+		coordinates[3] = 30.83898665;
+		coordinates[4] = 116.3136523;
+		coordinates[5] = 39.97118243; 
+	}
+}
+
+int TestPointSelect(const char* table_name, const char*data_file)
 {
 	std::string value;
-	std::string table("zj");
-	std::string loadfile("data//zj.txt");
+	std::string table(table_name);
+	std::string loadfile(data_file);
 	GBTEngine::load(table, loadfile, true);
-	GBTEngine::EqualSelect(table, 120.9349752,30.84378421, value);
-	assert(value.compare("亚细亚饭店") == 0);
-	GBTEngine::EqualSelect(table, 120.1656219,30.19457983, value);
-	assert(value.compare("空港票务滨江售票处") == 0);
-	GBTEngine::EqualSelect(table, 120.1272897,30.34521857, value);
-	assert(value.compare("祥运路") == 0);
+	double coordinates[6];
+	GetData(table, coordinates);
+	int count = 10000;
+	int i;
+	struct tms tmsbuf;
+	clock_t btime, etime;
+	int     bpagecnt, epagecnt;
+	btime = times(&tmsbuf); 
+	bpagecnt = GBTFile::getPageReadCount();
+	for(i = 0; i < count; i++)
+	{
+		GBTEngine::EqualSelect(table, coordinates[0], coordinates[1], value);
+		GBTEngine::EqualSelect(table, coordinates[2], coordinates[3], value);
+		GBTEngine::EqualSelect(table, coordinates[4], coordinates[5], value);
+	}
+	etime = times(&tmsbuf);
+	epagecnt = GBTFile::getPageReadCount();
+	count *= 3;
+	double duration = ((float)(etime - btime))/sysconf(_SC_CLK_TCK);
+	fprintf(stdout, "-- the duration is %.5f, the qps is %.5f, read %d pages\n", duration,  ((float)count) / duration, epagecnt - bpagecnt);
 	return 0;
 }
-int TestRangeQuery()
+int TestRangeQuery(const char* table_name, const char*data_file)
 {
 	int rt;
 	std::string value;
-	std::string table("zj");
-	std::string loadfile("data/zj.txt");
+	std::string table(table_name);
+	std::string loadfile(data_file);
 	std::vector<std::string> outputs;
 	rt = GBTEngine::load(table, loadfile, false);
 	assert(rt == 0);
@@ -59,13 +126,13 @@ int TestRangeQuery()
 	assert(rt == 0);
 	return rt;
 }
-int TestNearestQuery()
+int TestNearestQuery(const char* table_name, const char*data_file)
 {
 	int rt;
 	size_t count;
 	std::string value;
-	std::string table("zj");
-	std::string loadfile("data/zj.txt");
+	std::string table(table_name);
+	std::string loadfile(data_file);
 	std::vector<NearResult_t> outputs;
 	rt = GBTEngine::load(table, loadfile, false);
 	assert(rt == 0);

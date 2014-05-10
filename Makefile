@@ -1,7 +1,9 @@
+# Make file for GB-Tree
+#
+# Copyright (c) 2014 Edward liu
+
 CC = gcc
 CXX = g++
-CFLAGS = -Wall -ggdb
-CXXFLAGS = -Wall -ggdb
 TARGET = gbtree
 OBJS = main.o Geohash.o GBTEngine.o GBTreeIndex.o GBTreeNode.o GBTTable.o GBTFile.o GeoQuery.o TestGeoQuery.o PathManager.o
 HDR = GBTreeBase.h
@@ -9,7 +11,19 @@ vpath %.cc src
 vpath %.c src
 vpath %.h src
 
-all:	$(TARGET)
+
+ifeq ($(BUILD),debug)
+# "Debug" build - no optimization, and debugging symbols
+CFLAGS = -Wall -ggdb
+CXXFLAGS = -Wall -ggdb
+else
+ # "Release" build - optimization, and no debug symbols
+CFLAGS = -O2 -s -DNDEBUG
+CXXFLAGS = -O2 -s -DNDEBUG
+endif
+
+
+all: $(TARGET)
 $(TARGET): $(OBJS) $(HDR)
 	$(CXX) $(CFLAGS) -o $@ $(OBJS)
 

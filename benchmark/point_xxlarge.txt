@@ -1,0 +1,5 @@
+-- the duration is 0.49000, the qps is 61224.48860, read 170000 pages
+-- the duration is 0.49000, the qps is 61224.48860, read 170000 pages
+-- the duration is 0.52000, the qps is 57692.30981, read 170000 pages
+-- the duration is 0.49000, the qps is 61224.48860, read 170000 pages
+-- the duration is 0.50000, the qps is 60000.00000, read 170000 pages
