@@ -108,12 +108,10 @@ int TestPointSelect(const char* table_name, const char*data_file)
 }
 static void GetRange(std::string name, double *lnglat)
 {
-	if(name.compare("zj") == 0){
 		lnglat[0] = 120.2564013;
 		lnglat[1] = 30.1798758;
 		lnglat[2] = 120.2926970;
 		lnglat[3] = 30.2031151;
-	}
 
 }
 int TestRangeQuery(const char* table_name, const char*data_file)
