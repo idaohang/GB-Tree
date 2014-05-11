@@ -111,6 +111,10 @@ class GBTreeIndex {
    */
   int getTotalCount();
   
+  /**
+   * get total number of entries
+   */
+  int getPageCount();
   //debug
   PageId getRootPid();
   int getTreeHeight();

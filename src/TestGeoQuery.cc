@@ -15,7 +15,7 @@
  *
  * =====================================================================================
  */
-#include <sys/times.h>
+#include <sys/time.h>
 #include <assert.h>
 #include <stdio.h>
 #include <vector>
@@ -88,23 +88,33 @@ int TestPointSelect(const char* table_name, const char*data_file)
 	GetData(table, coordinates);
 	int count = 10000;
 	int i;
-	struct tms tmsbuf;
-	clock_t btime, etime;
+	struct timeval start, stop;
 	int     bpagecnt, epagecnt;
-	btime = times(&tmsbuf); 
+	
 	bpagecnt = GBTFile::getPageReadCount();
+	gettimeofday(&start, NULL);
 	for(i = 0; i < count; i++)
 	{
 		GBTEngine::EqualSelect(table, coordinates[0], coordinates[1], value);
 		GBTEngine::EqualSelect(table, coordinates[2], coordinates[3], value);
 		GBTEngine::EqualSelect(table, coordinates[4], coordinates[5], value);
 	}
-	etime = times(&tmsbuf);
+	gettimeofday(&stop, NULL);
 	epagecnt = GBTFile::getPageReadCount();
 	count *= 3;
-	double duration = ((float)(etime - btime))/sysconf(_SC_CLK_TCK);
+	double duration = (double)(stop.tv_usec - start.tv_usec) / 1000000.0;
 	fprintf(stdout, "-- the duration is %.5f, the qps is %.5f, read %d pages\n", duration,  ((float)count) / duration, epagecnt - bpagecnt);
 	return 0;
+}
+static void GetRange(std::string name, double *lnglat)
+{
+	if(name.compare("zj") == 0){
+		lnglat[0] = 120.2564013;
+		lnglat[1] = 30.1798758;
+		lnglat[2] = 120.2926970;
+		lnglat[3] = 30.2031151;
+	}
+
 }
 int TestRangeQuery(const char* table_name, const char*data_file)
 {
@@ -117,12 +127,17 @@ int TestRangeQuery(const char* table_name, const char*data_file)
 	assert(rt == 0);
 
 	double lnglat[4];
-	lnglat[0] = 120.2564013;
-	lnglat[1] = 30.1798758;
-	lnglat[2] = 120.2926970;
-	lnglat[3] = 30.2031151;
+	GetRange(table, lnglat);
+	struct timeval start, stop;
+	int     bpagecnt, epagecnt;
+	bpagecnt = GBTFile::getPageReadCount();
 
+	gettimeofday(&start, NULL);
 	rt = GBTEngine::RangeSelect(table, lnglat, outputs);
+	gettimeofday(&stop, NULL);
+	epagecnt = GBTFile::getPageReadCount();
+	fprintf(stdout, "--Page size is %d,  -- %lu microseconds to run the range command. Read %d pages\n",
+			GBTFile::PAGE_SIZE, stop.tv_usec - start.tv_usec, epagecnt - bpagecnt);
 	assert(rt == 0);
 	return rt;
 }

@@ -85,6 +85,7 @@ RT GBTEngine::load(const std::string& table, const std::string& loadfile, bool i
 		}
 	}
 
+	fprintf(stdout, "the number of pages is %d. ", index_file.getPageCount());
 	fclose(data_file);
 	table_file.close();
 	index_file.close();
@@ -179,37 +180,30 @@ RT GBTEngine::RangeSelectImpl(const std::string table, double* lnglat, std::vect
 	{
 		if(outputs.size() == 0)
 			return 0;
+		fprintf(stdout, "the number of outputs is %d. ", outputs.size());
 
-		if((rt = table_file.open(PathManager::GetTablePath(table), 'r')) < 0)
-			return rt;
-		std::vector<RecordId>::iterator it;
-		for(it = outputs.begin(); it != outputs.end(); ++it)
-		{
-			if((rt = table_file.read(*it, key, value)) != 0)
-			{
-				table_file.close();
-				return rt;
-			}
-			values.push_back(value);
-			fprintf(stdout, "%s\n", value.c_str());
-		}
+//		if((rt = table_file.open(PathManager::GetTablePath(table), 'r')) < 0)
+//			return rt;
+//		std::vector<RecordId>::iterator it;
+//		for(it = outputs.begin(); it != outputs.end(); ++it)
+//		{
+//			if((rt = table_file.read(*it, key, value)) != 0)
+//			{
+//				table_file.close();
+//				return rt;
+//			}
+//			values.push_back(value);
+//			//fprintf(stdout, "%s\n", value.c_str());
+//		}
 	}
-	table_file.close();
+//	table_file.close();
 	return 0;
 
 }
 RT GBTEngine::RangeSelect(const std::string table, double* lnglat, std::vector<std::string>& values)
 {
 	RT rt;
-	struct tms tmsbuf;
-	clock_t btime, etime;
-	int     bpagecnt, epagecnt;
-	btime = times(&tmsbuf); 
-	bpagecnt = GBTFile::getPageReadCount();
 	rt = RangeSelectImpl(table, lnglat, values);
-	etime = times(&tmsbuf);
-	epagecnt = GBTFile::getPageReadCount();
-	fprintf(stderr, "  -- %.5f seconds to run the select command. Read %d pages\n", ((float)(etime - btime))/sysconf(_SC_CLK_TCK), epagecnt - bpagecnt);
 	return rt;
 }
 RT GBTEngine::NearestSelectImpl(const std::string table, double* lnglat, std::vector<NearResult_t>& outputs, size_t count, double min_distance, double max_distance )

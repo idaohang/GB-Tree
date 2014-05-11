@@ -20,7 +20,7 @@ typedef int PageId;
 class GBTFile {
  public:
 
-  static const int PAGE_SIZE = 8192;    // the size of a page is 1KB
+  static const int PAGE_SIZE = 16384;    // the size of a page is 1KB
 
   GBTFile();
   GBTFile(const std::string& filename, char mode);

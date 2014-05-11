@@ -1,5 +1,5 @@
--- the duration is 0.46000, the qps is 65217.39012, read 140000 pages
--- the duration is 0.45000, the qps is 66666.66843, read 140000 pages
--- the duration is 0.45000, the qps is 66666.66843, read 140000 pages
--- the duration is 0.44000, the qps is 68181.81855, read 140000 pages
--- the duration is 0.44000, the qps is 68181.81855, read 140000 pages
+-- the duration is 0.44535, the qps is 67362.89966, read 140000 pages
+-- the duration is -0.55281, the qps is -54268.38975, read 140000 pages
+-- the duration is 0.44004, the qps is 68175.00068, read 140000 pages
+-- the duration is -0.54984, the qps is -54561.42616, read 140000 pages
+-- the duration is -0.55415, the qps is -54137.35730, read 140000 pages

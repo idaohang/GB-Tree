@@ -354,6 +354,24 @@ int GBTreeIndex::getTotalCount() {
 	return total;
 }
 
+int GBTreeIndex::getPageCount()
+{
+	RT rc;
+	IndexCursor cursor;
+	int total = 0;
+
+	if ((rc = pointToSmallestKey(cursor)) < 0) return rc;
+
+	PageId pid = cursor.pid;
+	GBTLeafNode leaf;
+
+	do {
+		if ((rc = leaf.read(pid, pf)) < 0) return rc;
+		total++;
+	} while ((pid = leaf.getNextNodePtr()) != 0);
+
+	return total;
+}
 //debug
 PageId GBTreeIndex::getRootPid()
 {
