@@ -1,0 +1,5 @@
+the number of pages is 26. the number of outputs is 1000. --Page size is 8196,  -- 4742 microseconds to run the range command. Read 15 pages
+the number of pages is 26. the number of outputs is 1000. --Page size is 8196,  -- 4673 microseconds to run the range command. Read 15 pages
+the number of pages is 26. the number of outputs is 1000. --Page size is 8196,  -- 4699 microseconds to run the range command. Read 15 pages
+the number of pages is 26. the number of outputs is 1000. --Page size is 8196,  -- 4689 microseconds to run the range command. Read 15 pages
+the number of pages is 26. the number of outputs is 1000. --Page size is 8196,  -- 4681 microseconds to run the range command. Read 15 pages

@@ -139,6 +139,33 @@ int TestRangeQuery(const char* table_name, const char*data_file)
 	assert(rt == 0);
 	return rt;
 }
+static void GetNearestCenter(std::string table, double *coordinates)
+{
+
+	if(table.compare("small") == 0){
+		coordinates[0] = 120.6656566;
+		coordinates[1] = 30.9074838;
+	}
+	else if(table.compare("middle") == 0){
+		coordinates[0] = 120.2657404;
+		coordinates[1] = 30.30048649;
+	}
+	else if(table.compare("large") == 0){
+		coordinates[0] = 120.3607551;
+		coordinates[1] = 36.1212045;
+	}
+	else if(table.compare("xlarge") == 0){
+		coordinates[0] = 116.6549728;
+		coordinates[1] = 39.88331447;
+	}
+	else if(table.compare("xxlarge") == 0){
+		coordinates[0] = 113.4583184;
+		coordinates[1] = 23.88698923;
+	}else{
+		coordinates[0] = 120.2892393;
+		coordinates[1] = 30.83898665;
+	}
+}
 int TestNearestQuery(const char* table_name, const char*data_file)
 {
 	int rt;
@@ -151,10 +178,20 @@ int TestNearestQuery(const char* table_name, const char*data_file)
 	assert(rt == 0);
 
 	double lnglat[2];
-	lnglat[0] = 120.158329;
-	lnglat[1] = 30.2786929;
-	count = 50;
-	rt = GBTEngine::NearestSelect(table, lnglat, outputs, count);
+	GetNearestCenter(table, lnglat);
+	double min_distance = 0;
+	double max_distance = 0;
+	count = 2000;
+	struct timeval start, stop;
+	int     bpagecnt, epagecnt;
+	bpagecnt = GBTFile::getPageReadCount();
+
+	gettimeofday(&start, NULL);
+	rt = GBTEngine::NearestSelect(table, lnglat, outputs, count, min_distance, max_distance);
+	gettimeofday(&stop, NULL);
+	epagecnt = GBTFile::getPageReadCount();
+	fprintf(stdout, "--Page size is %d,  -- %lu microseconds to run the range command. Read %d pages\n",
+			GBTFile::PAGE_SIZE, stop.tv_usec - start.tv_usec, epagecnt - bpagecnt);
 	assert(outputs.size() == count);
 
 	return rt;

@@ -3,9 +3,9 @@ GB-Tree
 
 B+ Tree For Storing GPS Data 
 
-Function:
+Functions:
 
-	1. Integrate Geohash With B+ Tree.
+	1. Integrating Geohash With B+ Tree.
 
 	2. Realizing Range-Query and K-NN algorithms.
 

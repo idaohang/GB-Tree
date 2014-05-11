@@ -223,26 +223,27 @@ RT GBTEngine::NearestSelectImpl(const std::string table, double* lnglat, std::ve
 		if(nearests.size() == 0)
 			return 0;
 
-		if((rt = table_file.open(PathManager::GetTablePath(table), 'r')) < 0)
-			return rt;
-		std::vector<NearestResult>::iterator it;
-		for(it = nearests.begin(); it != nearests.end(); ++it)
-		{
-			if((rt = table_file.read(it->rid, key, value)) != 0)
-			{
-				table_file.close();
-				return rt;
-			}
-			if(geohash_decode_64(key, &latitude, &longitude) == GEOHASH_OK)
-			{
-				result.longitude = longitude;
-				result.latitude = latitude;
-				result.value = value;
-				result.distance = it->distance;
-			}
-			outputs.push_back(result);
-			fprintf(stdout, "%s, dis: %.5f\n", value.c_str(), it->distance);
-		}
+		fprintf(stdout, "the number of outputs is %d. ", nearests.size());
+	//	if((rt = table_file.open(PathManager::GetTablePath(table), 'r')) < 0)
+	//		return rt;
+	//	std::vector<NearestResult>::iterator it;
+	//	for(it = nearests.begin(); it != nearests.end(); ++it)
+	//	{
+	//		if((rt = table_file.read(it->rid, key, value)) != 0)
+	//		{
+	//			table_file.close();
+	//			return rt;
+	//		}
+	//		if(geohash_decode_64(key, &latitude, &longitude) == GEOHASH_OK)
+	//		{
+	//			result.longitude = longitude;
+	//			result.latitude = latitude;
+	//			result.value = value;
+	//			result.distance = it->distance;
+	//		}
+	//		outputs.push_back(result);
+	//		fprintf(stdout, "%s, dis: %.5f\n", value.c_str(), it->distance);
+	//	}
 	}
 	table_file.close();
 	return 0;
