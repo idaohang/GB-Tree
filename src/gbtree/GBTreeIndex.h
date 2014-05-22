@@ -11,7 +11,7 @@
 
 #include <string>
 #include "../storagemanager/GBTFile.h"
-#include "../include/GBTreeBase.h"
+#include "../base/GBTreeBase.h"
 #include "GBTreeNode.h"
 #include "GBTTable.h"
 /**

@@ -10,7 +10,7 @@
 #define GBTFILE_H_
 
 #include <string>
-#include "../include/GBTreeBase.h"
+#include "../base/GBTreeBase.h"
 
 typedef int PageId;
 

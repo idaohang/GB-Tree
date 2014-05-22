@@ -10,7 +10,7 @@
 #define GBTREENODE_H_
 
 #include "../storagemanager/GBTFile.h"
-#include "../include/GBTreeBase.h"
+#include "../base/GBTreeBase.h"
 #include "GBTTable.h"
 
 /**

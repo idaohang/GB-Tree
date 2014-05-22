@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-#include "../include/GBTreeBase.h"
+#include "../base/GBTreeBase.h"
 
 enum {
 	GEOHASH_OK,

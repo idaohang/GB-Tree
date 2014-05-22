@@ -15,11 +15,11 @@
  *
  * =====================================================================================
  */
-#include <math.h>
 #include <set>
 #include <stack>
 #include "../storagemanager/GBTFile.h"
 #include "../pathmanager/PathManager.h"
+#include "../util/Distance.h"
 #include "GeoQuery.h"
 #include "Geohash.h"
 #include "GBTreeNode.h"
@@ -27,32 +27,6 @@
 static const uint64_t LATITUDE_HOLDER = UINT64_C(0x5555555555555555);
 static const uint64_t LONGITUDE_HOLDER = UINT64_C(0xaaaaaaaaaaaaaaaa);
 
-static const double PI = 3.1415926;
-static const double EARTH_RADIUS = 6378.137;
-/* *
- * convert the latitude and longitude to radian.
- *
- * */
-static double Rad(double d)
-{
-	return d * PI / 180.0 ;
-}
-/* *
- * convert latitude and longitude to distance (m)
- * */
-static double LatLon2Dist(double lat1, double lng1, double lat2, double lng2)
-{
-	double radLat1 = Rad(lat1);
-	double radLat2 = Rad(lat2);
-	double first = radLat1 - radLat2;
-	double second = Rad(lng1) - Rad(lng2);
-
-	double s = 2 * asin(sqrt(pow(sin(first/2), 2) + cos(radLat1) * cos(radLat2)
-				* pow( sin(second / 2), 2 )));
-	s *= EARTH_RADIUS;
-	s *= 1000;
-	return s;
-}
 
 uint32_t GeoQuery::range_precision = 3;
 double GeoQuery::default_precision = 0.00521025;

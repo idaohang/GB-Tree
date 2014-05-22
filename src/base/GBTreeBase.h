@@ -4,22 +4,13 @@
  * Public License (GPL).
  *
  * @author Edward Liou <Liou AT liuqi.edward@gmail.com>
- * @date 4/2/2014
+ * @date 5/2/2014
  */
 #ifndef GBTREEBASE_H_
 #define GBTREEBASE_H_
 //#define DEBUG
+#include "../util/Tools.h"
 #include <string.h>
-
-#if defined(_MSC_VER) && (_MSC_VER <= 1500)
-typedef unsigned __int8 uint8_t;
-typedef unsigned __int16 uint16_t;
-typedef unsigned __int64 uint64_t;
-#define UINT64_C(C) ((uint64_t) C ## ULL)
-#else
-#define __STDC_CONSTANT_MACROS 1
-#include <stdint.h>
-#endif
 
 typedef int RT;
 

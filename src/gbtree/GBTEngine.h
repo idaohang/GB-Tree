@@ -12,7 +12,7 @@
 #include <vector>
 #include <stdio.h>
 #include <string>
-#include "../include/GBTreeBase.h"
+#include "../base/GBTreeBase.h"
 typedef struct _NearResult{
 	uint64_t longitude;
 	uint64_t latitude;

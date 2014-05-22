@@ -12,7 +12,7 @@
 
 #include <vector>
 #include <string>
-#include "../include/GBTreeBase.h"
+#include "../base/GBTreeBase.h"
 #include "GBTTable.h"
 #include "GBTreeNode.h"
 #include "GBTreeIndex.h"

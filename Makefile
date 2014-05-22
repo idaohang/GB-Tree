@@ -5,9 +5,9 @@
 CC = gcc
 CXX = g++
 TARGET = gbtree
-OBJS = main.o Geohash.o GBTEngine.o GBTreeIndex.o GBTreeNode.o GBTTable.o GBTFile.o GeoQuery.o TestGeoQuery.o PathManager.o
-HDR = GBTreeBase.h
-VPATH = src/test:src/gbtree:src/storagemanager:src/pathmanager:src/path:src/include
+OBJS = main.o Geohash.o GBTEngine.o GBTreeIndex.o GBTreeNode.o GBTTable.o GBTFile.o GeoQuery.o TestGeoQuery.o PathManager.o Distance.o
+HDR = GBTreeBase.h Tools.h
+VPATH = src/test:src/gbtree:src/storagemanager:src/pathmanager:src/path:src/base:src/util
 
 
 ifeq ($(BUILD),debug)

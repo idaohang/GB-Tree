@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string>
 #include "../storagemanager/GBTFile.h"
-#include "../include/GBTreeBase.h"
+#include "../base/GBTreeBase.h"
 /**
  * The data structure for pointing to a particular record in a GBTTable.
  * A record id consists of pid (PageId) and sid (the slot number in the page)
